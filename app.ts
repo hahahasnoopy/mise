@@ -14,6 +14,7 @@ export function worker(username:string):Promise<any>{
     let view_state = ""
     let password = "000000"
   async function app(){
+    log("username: ",username)
     const mypass = password
     try {
       const result = await fetch(baseUrl);

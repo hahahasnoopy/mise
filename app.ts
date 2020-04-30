@@ -19,7 +19,9 @@ export function worker(username:string):Promise<any>{
     try {
       const result = await fetch(baseUrl);
       if (parseInt(password) > 999999 ) {
-        
+        fs.appendFile("result.txt", "faied " + "用户名: " + username + "密码: " + os.EOL, err => {
+          console.log(err);
+        });
         resolve(false)
         return;
       }
@@ -101,7 +103,7 @@ export function worker(username:string):Promise<any>{
     }
   }
   
-  for(let i=0;i<50;i++){
+  for(let i=0;i<100;i++){
     increase()
     app()
   }

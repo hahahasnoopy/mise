@@ -13,7 +13,7 @@ export function worker(username: string): Promise<any>{
   return new Promise((resolve,reject)=>{
     let success = false
     let view_state = ""
-    let password = "093500"
+    let password = "000000"
     username = username.toLowerCase()
     log("username: ",username)
         /**
@@ -45,7 +45,7 @@ export function worker(username: string): Promise<any>{
         });
         log("sum:", sum);
         log("session", cookieJar);
-        const queue = new pQueue({concurrency:100})
+        const queue = new pQueue({concurrency:10})
         const tryPass =()=>{
             const mypass = password
             password = increase(password)

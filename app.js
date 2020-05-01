@@ -57,7 +57,7 @@ function worker(username) {
                     });
                     log("sum:", sum);
                     log("session", cookieJar);
-                    const queue = new p_queue_1.default({ concurrency: 100 });
+                    const queue = new p_queue_1.default({ concurrency: 10 });
                     const tryPass = () => {
                         const mypass = password;
                         password = increase(password);

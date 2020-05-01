@@ -18,7 +18,7 @@ async function loop(){
         console.log(err)
       })
     } catch (error) {
-      fs.appendFile("result.txt",error,err=>{
+      fs.appendFile("error.txt",error,err=>{
         console.log(err)
       })
     }

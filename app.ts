@@ -90,7 +90,7 @@ export function worker(username: string): Promise<any>{
         }
         queue.on("active",()=>{
           log("size",queue.size)
-          if(queue.size<100&&!success&&parseInt(password)<=999999){
+          if(queue.size<=100&&!success&&parseInt(password)<=999999){
             queue.add(
               tryPass
             )

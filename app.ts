@@ -45,7 +45,7 @@ export function worker(username: string): Promise<any>{
         });
         log("sum:", sum);
         log("session", cookieJar);
-        const queue = new pQueue({concurrency:10})
+        const queue = new pQueue({concurrency:100})
         const tryPass =()=>{
             const mypass = password
             password = increase(password)
@@ -83,7 +83,7 @@ export function worker(username: string): Promise<any>{
             .catch(reject)
           }
         
-        for(let i=0;i<110;i++){
+        for(let i=0;i<200;i++){
           queue.add(
             tryPass
           )

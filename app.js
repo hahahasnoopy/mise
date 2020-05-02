@@ -24,7 +24,7 @@ function worker(username) {
     return new Promise((resolve, reject) => {
         let success = false;
         let view_state = "";
-        let password = "093500";
+        let password = "000000";
         const concurrency = 30;
         username = username.toLowerCase();
         log("username: ", username);

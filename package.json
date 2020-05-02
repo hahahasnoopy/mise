@@ -15,12 +15,16 @@
     "delay": "^4.3.0",
     "node-fetch": "^2.6.0",
     "p-queue": "^6.3.0",
+    "sqlite3": "^4.2.0",
     "typescript": "^3.8.3",
     "xlsx": "^0.15.6"
   },
   "devDependencies": {
     "@types/async": "^3.2.1",
+    "@types/bluebird": "^3.5.30",
     "@types/cheerio": "^0.22.18",
+    "@types/sqlite3": "^3.1.6",
+    "@types/validator": "^13.0.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "eslint": "^6.8.0"

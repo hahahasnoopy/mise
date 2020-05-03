@@ -95,15 +95,24 @@ function worker(username) {
                             done();
                         });
                     }, concurrency);
-                    while (parseInt(password) <= 999999 && !success) {
+                    const push = () => {
                         trypass.push(password, () => {
                             log("length", trypass.length());
                             log("running", trypass.running());
+                            if (trypass.length() < concurrency) {
+                                push();
+                            }
                             if (success) {
                                 trypass.kill();
                             }
+                            if (trypass.empty()) {
+                                resolve();
+                            }
                         });
                         password = increase(password);
+                    };
+                    while (parseInt(password) <= concurrency && !success) {
+                        push();
                     }
                 }
                 catch (error) {

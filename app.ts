@@ -13,7 +13,7 @@ export function worker(username: string): Promise<any>{
     let success = false
     let view_state = ""
     let password = "000000"
-    const concurrency = 1000
+    const concurrency = 100
     username = username.toLowerCase()
     log("username: ",username)
         /**
@@ -88,7 +88,7 @@ export function worker(username: string): Promise<any>{
           trypass.push(password,()=>{
             log("length",trypass.length())
             log("running",trypass.running())
-            if(trypass.length()<100){
+            if(trypass.length()<concurrency){
               push()
             }
             if(success){
@@ -100,7 +100,7 @@ export function worker(username: string): Promise<any>{
           })
           password = increase(password)
         }
-        while(parseInt(password)<=200&&!success){
+        while(parseInt(password)<=concurrency&&!success){
           push()
         }
       } catch (error) {

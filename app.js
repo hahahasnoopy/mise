@@ -25,7 +25,7 @@ function worker(username) {
         let success = false;
         let view_state = "";
         let password = "000000";
-        const concurrency = 30;
+        const concurrency = 100;
         username = username.toLowerCase();
         log("username: ", username);
         /**
@@ -97,6 +97,8 @@ function worker(username) {
                     }, concurrency);
                     while (parseInt(password) <= 999999 && !success) {
                         trypass.push(password, () => {
+                            log("length", trypass.length());
+                            log("running", trypass.running());
                             if (success) {
                                 trypass.kill();
                             }

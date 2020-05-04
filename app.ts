@@ -67,7 +67,7 @@ export function worker(username: string,password:string="000000",concurrency:num
              */
             const iflysse = Utils.getCookie(login);
             if (iflysse.length === 0) {
-              log("failed ", "password: ", password);
+              log("username: "+username,"failed ", "password: ", password);
             }
             else {
               log("success ", "用户名: ", username, "密码: ", password);

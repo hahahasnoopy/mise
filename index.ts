@@ -11,7 +11,12 @@ const sheet = workbook.Sheets["符合不符合校内导师条件学生名单"]
 const arr  = xlsx.utils.sheet_to_json<Item>(sheet,{header:"A"}).map(a=>a.A)
 
 let p = Promise.resolve()
+
 arr.forEach((item,i)=>{
+
+  if(!item) {
+    return
+  }
   p = p.then(()=>
     {
       console.log("initing",item)

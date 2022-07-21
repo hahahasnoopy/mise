@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-07-21T14:58:16.415Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="sOgqhZ7Qt5eAdRPyxMzB" version="20.1.4" type="github">
+<mxfile host="app.diagrams.net" modified="2022-07-21T15:00:48.722Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="1l0xXAgGiXJh8mHB9Wlq" version="20.1.4" type="github">
   <diagram id="g1EtmUcoVbFlvG659P1Y" name="Page-1">
     <mxGraphModel dx="313" dy="167" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -8,10 +8,10 @@
           <mxGeometry x="520" y="190" width="41" height="50" as="geometry" />
         </mxCell>
         <mxCell id="N3sH6_QPQESTDIZ-bmeJ-9" value="web server" style="aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image;image=img/lib/active_directory/web_server.svg;" vertex="1" parent="1">
-          <mxGeometry x="414" y="280" width="40" height="50" as="geometry" />
+          <mxGeometry x="420" y="280" width="40" height="50" as="geometry" />
         </mxCell>
         <mxCell id="N3sH6_QPQESTDIZ-bmeJ-12" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.mobile;pointerEvents=1;" vertex="1" parent="1">
-          <mxGeometry x="290" y="190" width="35" height="50" as="geometry" />
+          <mxGeometry x="310" y="195" width="25" height="40" as="geometry" />
         </mxCell>
         <mxCell id="N3sH6_QPQESTDIZ-bmeJ-13" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="N3sH6_QPQESTDIZ-bmeJ-12" target="N3sH6_QPQESTDIZ-bmeJ-9">
           <mxGeometry width="100" height="100" relative="1" as="geometry">

@@ -1,1 +1,97 @@
-<mxfile host="app.diagrams.net" modified="2022-07-21T12:47:58.786Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" version="20.0.4" etag="L3tdz4nwsw1USRN1VSsd" type="github"><diagram id="v4Y9XoKXaRCEiuXZ6VPU">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-07-21T13:20:32.874Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="YiOXE5b8PL2yFSF_t_VG" version="20.0.4" type="github">
+  <diagram id="v4Y9XoKXaRCEiuXZ6VPU" name="Page-1">
+    <mxGraphModel dx="1203" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="B6HLU-mTkvNt3r43491u-1" value="开发者" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="243.5" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-2" value="gitlab" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/socialcones/508/Gitlab-128.png" vertex="1" parent="1">
+          <mxGeometry x="130" y="227.5" width="87" height="87" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-3" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-1" target="B6HLU-mTkvNt3r43491u-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="70" y="266.5" as="sourcePoint" />
+            <mxPoint x="120" y="216.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-4" value="push" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="B6HLU-mTkvNt3r43491u-3">
+          <mxGeometry x="-0.1988" y="5" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-5" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="160.5" width="260" height="219.5" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-6" target="B6HLU-mTkvNt3r43491u-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="260" />
+              <mxPoint x="370" y="194" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-6" target="B6HLU-mTkvNt3r43491u-11">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="260" />
+              <mxPoint x="370" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-6" value="eslint&lt;br&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/unicons-line-vol-3/24/gitlab-128.png" vertex="1" parent="1">
+          <mxGeometry x="300" y="230" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-8" value="微信平台打包" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/unicons-line-vol-3/24/gitlab-128.png" vertex="1" parent="1">
+          <mxGeometry x="430" y="163.5" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-11" value="m站打包" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/unicons-line-vol-3/24/gitlab-128.png" vertex="1" parent="1">
+          <mxGeometry x="430" y="290" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-18" value="gitlab runners" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="384" y="400" width="96" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-21" value="" style="sketch=0;aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Docker.svg;" vertex="1" parent="1">
+          <mxGeometry x="610" y="228" width="104.89" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-24" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-5" target="B6HLU-mTkvNt3r43491u-21">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="310" as="sourcePoint" />
+            <mxPoint x="600" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-25" value="部署" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="B6HLU-mTkvNt3r43491u-24">
+          <mxGeometry x="-0.2217" y="3" relative="1" as="geometry">
+            <mxPoint y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-26" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-2" target="B6HLU-mTkvNt3r43491u-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="220" y="310" as="sourcePoint" />
+            <mxPoint x="270" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-27" value="触发" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="B6HLU-mTkvNt3r43491u-26">
+          <mxGeometry x="-0.558" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-29" value="企微通知&lt;br&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/social-media-2106/24/social_media_social_media_logo_wechat-128.png" vertex="1" parent="1">
+          <mxGeometry x="610" y="350" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-30" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="B6HLU-mTkvNt3r43491u-5" target="B6HLU-mTkvNt3r43491u-29">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530" y="380" as="sourcePoint" />
+            <mxPoint x="580" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="B6HLU-mTkvNt3r43491u-31" value="通知&lt;br&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="B6HLU-mTkvNt3r43491u-30">
+          <mxGeometry x="-0.2903" y="5" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
